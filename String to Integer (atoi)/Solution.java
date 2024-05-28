@@ -1,77 +1,37 @@
 class Solution {
     public int myAtoi(String s) {
-        int result = 0;
-        int length = s.length();
-        if (length == 0) return result;
+        long result = 0;
+        int n = s.length();
 
-        int i = 0;
-        boolean isPositive = true;
-        Stack<Integer> stack = new Stack<>();
-        char c = s.charAt(i);
+        if (n == 0) return (int) result;
 
-        while (c == ' ') {
-            i++;
-            if (i == length) return result;
-            c = s.charAt(i);
+        int left = 0;
+        int right = left;
+        int sign = 1;
+
+        while (right < n && s.charAt(right) == ' ') {
+            left++;
+            right++;
         }
 
-        if (c == '-') {
-            isPositive = false;
-            i++;
-            if (i == length) return result;
-            c = s.charAt(i);
+        if (right < n && (s.charAt(right) == '-' || s.charAt(right) == '+')) {
+            if (s.charAt(right) == '-') sign = -1;
+            left++;
+            right++;
         }
-        else if (c == '+') {
-            i++;
-            if (i == length) return result;
-            c = s.charAt(i);
-        }
-        else if (!Character.isDigit(c)) return result;
-        else if (c == '0') {
-            while (c == '0') {
-                i++;
-                if (i == length) return result;
-                c = s.charAt(i);
+
+        while (right < n && Character.isDigit(s.charAt(right))) right++;
+        while (left != right) {
+            result = result * 10 + s.charAt(left) - '0';
+            if (result > Integer.MAX_VALUE) {
+                if (sign == -1) return Integer.MIN_VALUE;
+                return Integer.MAX_VALUE;
             }
+            left++;
         }
 
-        while (Character.isDigit(c)) {
-            stack.push(Character.getNumericValue(c));
-            i++;
-            if (i == length) break;
-            c = s.charAt(i);
-        }
+        if (sign == -1) return -1 * (int) result;
+        return (int) result;
 
-        int digits = 0;
-        long total = 0;
-        long base = 1;
-        boolean exceedsLong = false;
-
-        while (!stack.empty()) {
-            digits++;
-            total += (long) stack.pop() * base;
-            if (total > (long) Integer.MAX_VALUE || digits > 64) {
-                exceedsLong = true;
-                break;
-            }
-            base *= (long) 10;
-        }
-
-        if (exceedsLong) {
-            if (!isPositive) return Integer.MIN_VALUE;
-            return Integer.MAX_VALUE;
-        }
-
-        if (!isPositive) total *= -1;
-
-        if (total <= (long) Integer.MIN_VALUE) {
-            result = Integer.MIN_VALUE;
-        }
-        else if (total >= (long) Integer.MAX_VALUE) {
-            result = Integer.MAX_VALUE;
-        }
-        else result = (int) total;
-
-        return result;
     }
 }
